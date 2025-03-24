@@ -32,8 +32,10 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
-            ],
+  "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+  "src/styles.scss"
+],
             "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -95,13 +97,18 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+         "styles": [
+  "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+  "src/styles.scss"
+],
             "scripts": []
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "d80258cc-5b6a-453a-8808-5cee71776398"
   }
 }
