@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h2>Add New User</h2>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input type="text" formControlName="name" class="form-control" placeholder="Enter name" />
+      <div *ngIf="userForm.get('name')?.touched && userForm.get('name')?.invalid" class="text-danger">
+        Name is required.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" formControlName="email" class="form-control" placeholder="Enter email" />
+      <div *ngIf="userForm.get('email')?.touched && userForm.get('email')?.invalid" class="text-danger">
+        <div *ngIf="userForm.get('email')?.errors?.['required']">Email is required.</div>
+        <div *ngIf="userForm.get('email')?.errors?.['email']">Enter a valid email.</div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Phone</label>
+      <input type="text" formControlName="phone" class="form-control" placeholder="Enter phone (min 10 digits)" />
+      <div *ngIf="userForm.get('phone')?.touched && userForm.get('phone')?.invalid" class="text-danger">
+        <div *ngIf="userForm.get('phone')?.errors?.['required']">Phone number is required.</div>
+        <div *ngIf="userForm.get('phone')?.errors?.['pattern']">Phone number must be at least 10 digits.</div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Address</label>
+      <textarea formControlName="address" class="form-control" placeholder="Enter address"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <div *ngIf="successMessage" class="alert alert-success mt-3">
+      {{ successMessage }}
+    </div>
+  </form>
+  <!-- Display the added users below the form -->
+  <div class="mt-4">        
+    <h3>Current Users (from form)</h3>
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor="let user of (userService.users$ | async)">
+        {{ user.name }} - {{ user.email }} - {{ user.phone }}
+      </li>
+    </ul>
+  </div>
+</div>

@@ -4,15 +4,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-user-management',   
+  selector: 'app-user-management',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
-}) 
+})
 export class UserManagementComponent implements OnInit {
   users: User[] = [];
-  filteredUsers: User[] = [];
   searchTerm: string = '';
   userForm: FormGroup;
   selectedUser: User | null = null;
@@ -20,7 +19,7 @@ export class UserManagementComponent implements OnInit {
   showModal: boolean = false;
 
   constructor(private userService: UserService, private fb: FormBuilder) {
-    // Initialize form in the constructor
+    // Form for editing a user
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -29,32 +28,33 @@ export class UserManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fetchUsers();
-  }
+    // Load local JSON data
+    this.userService.loadUsers();
 
-  fetchUsers(): void {
-    this.userService.getUsers().subscribe(users => {
+    // Subscribe to the user list for real-time updates
+    this.userService.users$.subscribe(users => {
       this.users = users;
-      this.filteredUsers = users;
     });
   }
 
-  filterUsers(): void {
+  // Filter users by name/email    
+  filterUsers(): User[] {
     const term = this.searchTerm.toLowerCase();
-    this.filteredUsers = this.users.filter(u =>
+    return this.users.filter(u =>
       u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
     );
   }
 
+  // Delete user
   deleteUser(id: number): void {
-    // For this test, simply remove the user from the local array
-    this.users = this.users.filter(u => u.id !== id);
-    this.filteredUsers = this.filteredUsers.filter(u => u.id !== id);
+    this.userService.deleteUser(id);
   }
 
+  // Open the modal in "view" or "edit" mode
   openModal(user: User, mode: 'view' | 'edit'): void {
     this.selectedUser = { ...user };
     this.modalMode = mode;
+
     if (mode === 'edit') {
       this.userForm.patchValue({
         name: user.name,
@@ -65,19 +65,20 @@ export class UserManagementComponent implements OnInit {
     this.showModal = true;
   }
 
+  // Close modal
   closeModal(): void {
     this.showModal = false;
     this.selectedUser = null;
   }
 
+  // Save user after editing
   saveUser(): void {
     if (this.userForm.valid && this.selectedUser) {
-      this.selectedUser.name = this.userForm.value.name;
-      this.selectedUser.email = this.userForm.value.email;
-      this.selectedUser.phone = this.userForm.value.phone;
-      // Update user in the local array
-      this.users = this.users.map(u => u.id === this.selectedUser!.id ? this.selectedUser! : u);
-      this.filteredUsers = this.users;
+      const updatedUser: User = {
+        ...this.selectedUser,
+        ...this.userForm.value
+      };
+      this.userService.updateUser(updatedUser);
       this.closeModal();
     }
   }
